@@ -18,7 +18,8 @@ module.exports.Menu = class {
         this.currentPage = pages[0];
         this.page = 0;
 
-        this.menu = channel.send(this.currentPage).then(() => {
+        channel.send(this.currentPage).then(menu => {
+            this.menu = menu;
             this.react();
             this.awaitReactions();
         });
