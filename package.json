@@ -1,0 +1,14 @@
+{
+  "name": "discord.js-menu",
+  "version": "1.0.0",
+  "description": "▶ Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jowsey",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  }
+}
