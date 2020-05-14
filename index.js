@@ -11,16 +11,17 @@ const { TextChannel } = require('discord.js');
  */
 
 module.exports.Menu = class {
-    async constructor(channel = new TextChannel(), userID, pages = [{name: "main", content: new MessageEmbed().setTitle("Discord.js-Menu Default Page").setLink("https://npm.im/discord.js-menu"), reactions: {"⏹": "stop"}}]) {
+    constructor(channel = new TextChannel(), userID, pages = [{name: "main", content: new MessageEmbed().setTitle("Discord.js-Menu Default Page").setLink("https://npm.im/discord.js-menu"), reactions: {"⏹": "stop"}}]) {
         this.channel = channel;
         this.userID = userID;
         this.pages = pages;
         this.currentPage = pages[0];
         this.page = 0;
 
-        this.menu = await channel.send(this.currentPage);
-        this.react();
-        this.awaitReactions();
+        this.menu = channel.send(this.currentPage).then(() => {
+            this.react();
+            this.awaitReactions();
+        });
     }
     setPage(page = 0) {
         this.page = page;
