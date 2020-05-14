@@ -27,8 +27,12 @@ module.exports.Menu = class {
     setPage(page = 0) {
         this.page = page;
         this.currentPage = this.pages[this.page];
-        this.menu.reactions.removeAll();
         this.menu.edit(this.currentPage.content);
+        
+        this.menu.reactions.removeAll();
+        this.reactionCollector.stop();
+        this.react();
+        this.awaitReactions();
     }
     react() {
         for(const reaction in this.currentPage.reactions) {
@@ -36,8 +40,8 @@ module.exports.Menu = class {
         }
     }
     awaitReactions() {
-        let reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id == this.userID, {time: 180000});
-        reactionCollector.on('collect', reaction => {
+        this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id == this.userID, {time: 180000});
+        this.reactionCollector.on('collect', reaction => {
             if (this.currentPage.reactions.hasOwnProperty(reaction.emoji.name)) {
                 let destination = this.currentPage.reactions[reaction.emoji.name];
                 switch (destination) {
@@ -58,7 +62,7 @@ module.exports.Menu = class {
                         }
                         break;
                     case "stop":
-                        reactionCollector.stop();
+                        this.reactionCollector.stop();
                         this.menu.delete();
                         break;
                     default:
@@ -66,9 +70,6 @@ module.exports.Menu = class {
                         break;
                 }
             }
-        });
-        reactionCollector.on('end', () => {
-            this.menu.delete();
         });
     }
 }
