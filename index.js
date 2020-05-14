@@ -26,7 +26,7 @@ module.exports.Menu = class {
     }
     setPage(page = 0) {
         this.page = page;
-        this.currentPage = pages[this.page];
+        this.currentPage = this.pages[this.page];
         this.menu.reactions.removeAll();
         this.menu.edit(this.currentPage.content);
     }
