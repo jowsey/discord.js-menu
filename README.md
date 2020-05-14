@@ -1,7 +1,9 @@
 ![logo](https://i.imgur.com/nQSqrrk.png)
 <h4 align="center">Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.</h4>
 
-<img src="https://i.imgur.com/mFA31kh.gif" width="480" height="270" align="center">
+<p align="center" style="border-radius:32px">
+<img src="https://i.imgur.com/mFA31kh.gif" width="480" height="270">
+</p>
 
 ### Installation
 In your project directory:
