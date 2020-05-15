@@ -1,8 +1,14 @@
 ![logo](https://i.imgur.com/nQSqrrk.png)
 <h4 align="center">Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.</h4>
 
-<p align="center" style="border-radius:32px">
-<img src="https://i.imgur.com/mFA31kh.gif" width="480" height="270">
+<p align="center">
+    <a href="https://nodei.co/npm/discord.js-menu/"><img src="https://nodei.co/npm/discord.js-menu.png"></a>
+    <img alt="npm" src="https://img.shields.io/npm/dw/discord.js-menu">
+    <img alt="npm (prod) dependency version" src="https://img.shields.io/npm/dependency-version/discord.js-menu/discord.js">
+</p>
+
+<p align="center">
+    <img src="https://i.imgur.com/mFA31kh.gif" width="480" height="270"> 
 </p>
 
 ### Installation
