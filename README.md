@@ -4,6 +4,7 @@
 <p align="center">
     <a href="https://nodei.co/npm/discord.js-menu/"><img src="https://nodei.co/npm/discord.js-menu.png"></a><br>
     <img alt="npm" src="https://img.shields.io/npm/dw/discord.js-menu">
+    <img alt="npm" src="https://img.shields.io/npm/dt/discord.js-menu">
     <img alt="npm (prod) dependency version" src="https://img.shields.io/npm/dependency-version/discord.js-menu/discord.js">
 </p>
 
