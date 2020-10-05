@@ -29,7 +29,7 @@ const client = new Client()
 
 client.on('message', message => {
     if (message.content === "!help") {
-        // Provide a menu with a channel, an author ID to let control the menu, and an array of menu pages.
+        // Create a new menu with a channel to send in, a user ID to let control the menu, and an array of menu pages.
         let helpMenu = new Menu(message.channel, message.author.id, [
             // Each object in this array is a unique page.
             {
