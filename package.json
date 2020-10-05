@@ -1,7 +1,7 @@
 {
   "name": "discord.js-menu",
-  "version": "2.0.0",
-  "description": "💬 Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.",
+  "version": "2.0.1",
+  "description": "💬 Easily create Discord.js embed menus with reactions and unlimited customisable pages.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

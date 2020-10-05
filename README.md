@@ -1,15 +1,11 @@
 <div align="center">
-    <img src="https://i.imgur.com/GnLwz6d.png" width="580">
-    <h4>Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.</h4>
+    <img src="https://i.imgur.com/c7vEVPS.png" width="580">
+    <h4>Easily create Discord.js embed menus with reactions and unlimited customisable pages.</h4>
     <a href="https://nodei.co/npm/discord.js-menu/"><img src="https://nodei.co/npm/discord.js-menu.png"></a><br>
     <img alt="npm" src="https://img.shields.io/npm/dw/discord.js-menu">
     <img alt="npm" src="https://img.shields.io/npm/dt/discord.js-menu">
     <img alt="npm (prod) dependency version" src="https://img.shields.io/npm/dependency-version/discord.js-menu/discord.js">
 </div>
-
-<p align="center">
-    <img src="https://i.imgur.com/mFA31kh.gif" width="480" height="270"> 
-</p>
 
 ### Installation
 In your project directory:
