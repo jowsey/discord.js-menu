@@ -1,13 +1,26 @@
 {
   "name": "discord.js-menu",
-  "version": "1.0.0",
-  "description": "▶ Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.",
+  "version": "2.0.0",
+  "description": "💬 Automatically create Discord.js embed menus with reactions and multiple completely customisable pages.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jowsey",
   "license": "MIT",
+  "repository": "https://github.com/jowsey/discord.js-menu",
+  "keywords": [
+    "discord",
+    "discord-js",
+    "discord-bot",
+    "discord-api",
+    "discordapp",
+    "library",
+    "bot",
+    "menu",
+    "framework",
+    "discordjs"
+  ],
   "dependencies": {
     "discord.js": "^12.2.0"
   }
