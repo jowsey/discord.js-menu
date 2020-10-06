@@ -114,3 +114,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+#  Not unit tests, just general tests used for testing the library, like bots
+.tests/

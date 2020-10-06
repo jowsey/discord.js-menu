@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events')
-const { TextChannel, MessageEmbed } = require('discord.js')
+const { TextChannel, MessageEmbed, Message } = require('discord.js')
 const requiredPerms = ['SEND_MESSAGES', 'EMBED_LINKS', 'ADD_REACTIONS', 'MANAGE_MESSAGES']
 
 /**
@@ -35,15 +35,17 @@ module.exports.Menu = class extends EventEmitter {
     * @param {String} pages.name The page's name, used as a destination for reactions.
     * @param {MessageEmbed} pages.content The page's embed content.
     * @param {Object} pages.reactions The reaction options that the page has.
+    * @param {Number} ms The number of milliseconds the menu will collect reactions for before it stops to save resources. (seconds * 1000)
     *
     * @remarks
     * Blacklisted page names are: `first, last, previous, next, stop, delete`.
     * These names perform special functions and should only be used as reaction destinations.
     */
-  constructor (channel, userID, pages) {
+  constructor (channel, userID, pages, ms = 180000) {
     super()
     this.channel = channel
     this.userID = userID
+    this.ms = ms
 
     const missingPerms = []
     // this usually means it's a dm channel that hasn't been created
@@ -153,7 +155,11 @@ module.exports.Menu = class extends EventEmitter {
   addReactions () {
     for (const reaction in this.currentPage.reactions) {
       this.menu.react(reaction).catch(error => {
-        console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | You're probably missing 'ADD_REACTIONS' in #${this.channel.name} (${this.channel.guild.name}), needed for adding reactions to the page.`)
+        if (error.toString().indexOf('Unknown Emoji') >= 0) {
+          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | The emoji you were trying to add to page "${this.currentPage.name}" (${reaction}) probably doesn't exist. You probably entered the ID wrong when adding a custom emoji.`)
+        } else {
+          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | You're probably missing 'ADD_REACTIONS' in #${this.channel.name} (${this.channel.guild.name}), needed for adding reactions to the page.`)
+        }
       })
     }
   }
@@ -162,10 +168,13 @@ module.exports.Menu = class extends EventEmitter {
    * Start a reaction collector and switch pages where required.
    */
   awaitReactions () {
-    this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id === this.userID, { time: 180000 })
+    this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id === this.userID, { time: this.ms })
     this.reactionCollector.on('collect', reaction => {
-      if (Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.name)) {
-        switch (this.currentPage.reactions[reaction.emoji.name]) {
+      // If the name exists, prioritise using that, otherwise, use the ID. If neither are in the list, don't run anything.
+      const reactionName = Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.name) ? reaction.emoji.name
+        : Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.id) ? reaction.emoji.id : null
+      if (reactionName) {
+        switch (this.currentPage.reactions[reactionName]) {
           case 'first':
             this.setPage(0)
             break
@@ -190,10 +199,13 @@ module.exports.Menu = class extends EventEmitter {
             break
           default:
             // TODO: Sort out documenting this as a TSDoc event.
-            this.setPage(this.pages.findIndex(p => p.name === this.currentPage.reactions[reaction.emoji.name]))
+            this.setPage(this.pages.findIndex(p => p.name === this.currentPage.reactions[reactionName]))
             break
         }
       }
+    })
+    this.reactionCollector.on('end', () => {
+      this.clearReactions()
     })
   }
 }

@@ -6,8 +6,6 @@
     <img alt="npm" src="https://img.shields.io/npm/dw/discord.js-menu">
     <img alt="npm" src="https://img.shields.io/npm/dt/discord.js-menu">
     <img alt="npm (prod) dependency version" src="https://img.shields.io/npm/dependency-version/discord.js-menu/discord.js">
-    
-    
 </div>
 
 ### Installation
@@ -32,7 +30,7 @@ const client = new Client()
 
 client.on('message', message => {
     if (message.content === "!help") {
-        // Create a new menu with a channel to send in, a user ID to let control the menu, and an array of menu pages.
+        // Provide a menu with a channel, an author ID to let control the menu, and an array of menu pages.
         let helpMenu = new Menu(message.channel, message.author.id, [
             // Each object in this array is a unique page.
             {
@@ -60,7 +58,10 @@ client.on('message', message => {
                     '◀': 'first'
                 }
             }
-        ])
+            // The last parameter is the number of milliseconds you want the menu to collect reactions for each page before it stops to save resources
+            // The timer is reset when a user interacts with the menu.
+            // This is optional, and defaults to 180000 (3 minutes).
+        ], 300000)
         // Run Menu.start() when you're ready to send the menu in chat.
         // Once sent, the menu will automatically handle everything else.
         helpMenu.start()
@@ -84,7 +85,7 @@ In the `reactions` object, each key is an emoji, and its value a destination you
 
 Note that whilst calling a page one of these wouldn't break anything (the page would still be accessible using, for example, the `next` and `previous` destinations) you wouldn't be able to directly link to it.
 
-### (New!) Events and dynamic pages
+### Events and dynamic pages
 New to v2.0.0 is the ability to create pages that can be entirely unique and dynamic.  
 v2.0.0 adds the "pageChange" event to the Menu class, which fires just before the message actually edits, meaning you can edit the page with any variables you want before it gets fed into the menu.
 Here's an example of creating a menu page based on a user's profile info.
@@ -99,7 +100,7 @@ client.on('message', message => {
                 color: 0x7289DA
             })
         }
-    ])
+    ], 300000)
     userMenu.start()
 
     userMenu.on('pageChange', destination => {
@@ -115,6 +116,10 @@ And there you have it, a custom menu page just for you!
 Now, of course one lone page isn't all that exciting - that's why we have reaction menus! Why not expand the menu into a full dashboard of user data with multiple areas? Remember, you can also dynamically edit the `destination.reactions` and `destination.name` if you'd like to spice things up a little.
   
 I'm well aware this is still a bit of a janky workaround for some cases, and I'm working on making this more streamlined.
+
+### Custom emojis as reactions
+You can now add custom emojis as reactions by substituting the emoji symbol (eg: 😳) for the ID of the emoji (eg: 745849372638471028).  
+I've tested this and confirmed it works, but please do create an issue if you have any issues with custom emojis.
 
 ### Acknowledgements
 This project was heavily inspired by Juby210's [discord.js-reaction-menu](https://github.com/Juby210/discord.js-reaction-menu).  
