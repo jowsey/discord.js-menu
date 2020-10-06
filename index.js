@@ -60,6 +60,7 @@ module.exports.Menu = class extends EventEmitter {
       })
       if (missingPerms.length) console.log(`\x1B[96m[discord.js-menu]\x1B[0m Looks like you're missing ${missingPerms.join(', ')} in #${this.channel.name} (${this.channel.guild.name}). This perm is needed for basic menu operation. You'll probably experience problems sending menus in this channel.`)
     } else {
+      console.log(`\x1B[96m[discord.js-menu]\x1B[0m Looks like you're trying to send a menu as a DM (to ${this.channel.recipient.tag}). DMs don't allow removing other people's reactions, making the menu fundamentally broken. The menu will still send, but you have been warned that what you're doing almost certainly won't work, so don't come complaining to me.`)
     }
 
     /**
@@ -127,7 +128,11 @@ module.exports.Menu = class extends EventEmitter {
   clearReactions () {
     if (this.menu) {
       this.menu.reactions.removeAll().catch(error => {
-        console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | You're probably missing 'MANAGE_MESSAGES' in #${this.channel.name} (${this.channel.guild.name}), needed for removing reactions when changing pages.`)
+        if (this.channel.type === 'dm') {
+          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | Told you so.`)
+        } else {
+          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | You're probably missing 'MANAGE_MESSAGES' in #${this.channel.name} (${this.channel.guild.name}), needed for removing reactions when changing pages.`)
+        }
       })
     }
   }
