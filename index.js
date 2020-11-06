@@ -167,7 +167,7 @@ module.exports.Menu = class extends EventEmitter {
    * React to the new page with all of it's defined reactions
    */
   addReactions () {
-    for (var reaction in this.currentPage.reactions) {
+    for (const reaction in this.currentPage.reactions) {
       //if (typeof Number.parseInt(reaction) == "number") reaction = emojiNumbers[reaction];
       this.menu.react(reaction).catch(error => {
         if (error.toString().indexOf('Unknown Emoji') >= 0) {
