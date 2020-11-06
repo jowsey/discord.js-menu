@@ -1,6 +1,7 @@
 const { EventEmitter } = require('events')
 const { TextChannel, MessageEmbed, Message } = require('discord.js')
 const requiredPerms = ['SEND_MESSAGES', 'EMBED_LINKS', 'ADD_REACTIONS', 'MANAGE_MESSAGES']
+const emojiNumbers = ["\u0030\u20E3","\u0031\u20E3","\u0032\u20E3","\u0033\u20E3","\u0034\u20E3","\u0035\u20E3", "\u0036\u20E3","\u0037\u20E3","\u0038\u20E3","\u0039\u20E3"]
 
 /**
  * A page object that the menu can display.
@@ -16,6 +17,14 @@ class Page {
   constructor (name, content, reactions, index) {
     this.name = name
     this.content = content
+    
+    for (const aReaction in reactions) { //Iterates through reactions.
+      if (!isNaN(aReaction)) { //sees a number, in string or without string. 
+        if(parseInt(aReaction) > 9) console.error("Only 0-9 reactions allowed."); //if the number is over 9 then we throw err.
+        reactions[emojiNumbers[aReaction]] = reactions[aReaction]; //replaces old key with the new one from emojiNumbers[aReactions].
+        delete reactions[aReaction]; //deletes the old key.
+      }
+    } 
     this.reactions = reactions
     this.index = index
   }
@@ -158,7 +167,8 @@ module.exports.Menu = class extends EventEmitter {
    * React to the new page with all of it's defined reactions
    */
   addReactions () {
-    for (const reaction in this.currentPage.reactions) {
+    for (var reaction in this.currentPage.reactions) {
+      //if (typeof Number.parseInt(reaction) == "number") reaction = emojiNumbers[reaction];
       this.menu.react(reaction).catch(error => {
         if (error.toString().indexOf('Unknown Emoji') >= 0) {
           console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | The emoji you were trying to add to page "${this.currentPage.name}" (${reaction}) probably doesn't exist. You probably entered the ID wrong when adding a custom emoji.`)
