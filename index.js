@@ -181,26 +181,28 @@ module.exports.Menu = class extends EventEmitter {
         ? reaction.emoji.name
         : Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.id) ? reaction.emoji.id : null
       if (reactionName) {
-        sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages.find(p => p.name === this.currentPage.reactions[reactionName]).reactions))
-
         this.reactionCollector.on('end', () => {
           !sameReactions ? this.clearReactions() : reaction.users.remove(user)
         })
 
         switch (this.currentPage.reactions[reactionName]) {
           case 'first':
+            sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages[0].reactions))
             this.setPage(0)
             break
           case 'last':
+            sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages[this.pages.length - 1].reactions))
             this.setPage(this.pages.length - 1)
             break
           case 'previous':
             if (this.pageIndex > 0) {
+              sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages[this.pageIndex - 1].reactions))
               this.setPage(this.pageIndex - 1)
             }
             break
           case 'next':
             if (this.pageIndex < this.pages.length - 1) {
+              sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages[this.pages.length + 1].reactions))
               this.setPage(this.pageIndex + 1)
             }
             break
@@ -212,6 +214,7 @@ module.exports.Menu = class extends EventEmitter {
             break
           default:
             // TODO: Sort out documenting this as a TSDoc event.
+            sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages.find(p => p.name === this.currentPage.reactions[reactionName]).reactions))
             this.setPage(this.pages.findIndex(p => p.name === this.currentPage.reactions[reactionName]))
             break
         }
