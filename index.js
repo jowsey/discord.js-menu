@@ -202,7 +202,7 @@ module.exports.Menu = class extends EventEmitter {
             break
           case 'next':
             if (this.pageIndex < this.pages.length - 1) {
-              sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages[this.pages.length + 1].reactions))
+              sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages[this.pageIndex + 1].reactions))
               this.setPage(this.pageIndex + 1)
             }
             break
