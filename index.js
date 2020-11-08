@@ -82,6 +82,7 @@ module.exports.Menu = class extends EventEmitter {
     this.currentPage = this.pages[0]
     /**
      * The index of the Pages array we're currently on.
+     * @type {Number}
      */
     this.pageIndex = 0
   }
@@ -148,7 +149,6 @@ module.exports.Menu = class extends EventEmitter {
     this.currentPage = this.pages[this.pageIndex]
     this.menu.edit(this.currentPage.content)
 
-    this.clearReactions()
     this.reactionCollector.stop()
     this.addReactions()
     this.awaitReactions()
@@ -174,11 +174,19 @@ module.exports.Menu = class extends EventEmitter {
    */
   awaitReactions () {
     this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id === this.userID, { time: this.ms })
-    this.reactionCollector.on('collect', reaction => {
+    let sameReactions
+    this.reactionCollector.on('collect', (reaction, user) => {
       // If the name exists, prioritise using that, otherwise, use the ID. If neither are in the list, don't run anything.
-      const reactionName = Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.name) ? reaction.emoji.name
+      const reactionName = Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.name)
+        ? reaction.emoji.name
         : Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.id) ? reaction.emoji.id : null
       if (reactionName) {
+        sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages.find(p => p.name === this.currentPage.reactions[reactionName]).reactions))
+
+        this.reactionCollector.on('end', () => {
+          !sameReactions ? this.clearReactions() : reaction.users.remove(user)
+        })
+
         switch (this.currentPage.reactions[reactionName]) {
           case 'first':
             this.setPage(0)
@@ -208,9 +216,6 @@ module.exports.Menu = class extends EventEmitter {
             break
         }
       }
-    })
-    this.reactionCollector.on('end', () => {
-      this.clearReactions()
     })
   }
 }
