@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://i.imgur.com/c7vEVPS.png" width="580">
+    <img src="https://i.imgur.com/a6Gzya2.png" width="580">
     <h4>Easily create Discord.js embed menus with reactions and unlimited customisable pages.</h4>
     <h4>Need help? Join the support server! https://discord.gg/VBDhRc8</h4>
     <a href="https://nodei.co/npm/discord.js-menu/"><img src="https://nodei.co/npm/discord.js-menu.png"></a><br>
