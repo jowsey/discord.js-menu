@@ -1,5 +1,4 @@
 const { EventEmitter } = require('events')
-const { TextChannel, MessageEmbed, Message } = require('discord.js')
 const requiredPerms = ['SEND_MESSAGES', 'EMBED_LINKS', 'ADD_REACTIONS', 'MANAGE_MESSAGES']
 
 /**
@@ -8,10 +7,10 @@ const requiredPerms = ['SEND_MESSAGES', 'EMBED_LINKS', 'ADD_REACTIONS', 'MANAGE_
 class Page {
   /**
     * Creates a menu page.
-    * @param {String} name The name of this page, used as a destination for reactions.
-    * @param {MessageEmbed} content The MessageEmbed content of this page.
-    * @param {Object} reactions The reactions that'll be added to this page.
-    * @param {Number} index The index of this page in the Menu
+    * @param {string} name The name of this page, used as a destination for reactions.
+    * @param {import('discord.js').MessageEmbed} content The MessageEmbed content of this page.
+    * @param {Object.<string, string | function>} reactions The reactions that'll be added to this page.
+    * @param {number} index The index of this page in the Menu
      */
   constructor (name, content, reactions, index) {
     this.name = name
@@ -29,12 +28,12 @@ class Page {
 module.exports.Menu = class extends EventEmitter {
   /**
     * Creates a menu.
-    * @param {TextChannel} channel The text channel you want to send the menu in.
+    * @param {import('discord.js').TextChannel} channel The text channel you want to send the menu in.
     * @param {String} userID The ID of the user you want to let control the menu.
     * @param {Object[]} pages An array of page objects with a name, content MessageEmbed and a set of reactions with page names which lead to said pages.
     * @param {String} pages.name The page's name, used as a destination for reactions.
-    * @param {MessageEmbed} pages.content The page's embed content.
-    * @param {Object} pages.reactions The reaction options that the page has.
+    * @param {import('discord.js').MessageEmbed} pages.content The page's embed content.
+    * @param {Object.<string, string | function>} pages.reactions The reaction options that the page has.
     * @param {Number} ms The number of milliseconds the menu will collect reactions for before it stops to save resources. (seconds * 1000)
     *
     * @remarks
@@ -91,6 +90,7 @@ module.exports.Menu = class extends EventEmitter {
    * Send the Menu and begin listening for reactions.
    */
   start () {
+    // TODO: Sort out documenting this as a TSDoc event.
     this.emit('pageChange', this.currentPage)
     this.channel.send(this.currentPage.content).then(menu => {
       this.menu = menu
@@ -128,7 +128,7 @@ module.exports.Menu = class extends EventEmitter {
    */
   clearReactions () {
     if (this.menu) {
-      this.menu.reactions.removeAll().catch(error => {
+      return this.menu.reactions.removeAll().catch(error => {
         if (this.channel.type === 'dm') {
           console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | Told you so.`)
         } else {
@@ -173,17 +173,32 @@ module.exports.Menu = class extends EventEmitter {
    * Start a reaction collector and switch pages where required.
    */
   awaitReactions () {
-    this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id === this.userID, { time: this.ms })
+    this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id !== this.menu.client.user.id, { idle: this.ms })
+
     let sameReactions
+    this.reactionCollector.on('end', (reactions) => {
+      // Whether the end was triggered by pressing a reaction or the menu just ended.
+      if (reactions) {
+        return !sameReactions ? this.clearReactions() : reactions.array()[0].users.remove(this.menu.client.users.cache.get(this.userID))
+      } else {
+        return this.clearReactions()
+      }
+    })
+
     this.reactionCollector.on('collect', (reaction, user) => {
+      // If a 3rd party tries to add reactions or the reaction isn't registered, delete it.
+      if (user.id !== this.userID || !Object.keys(this.currentPage.reactions).includes(reaction.emoji.name)) {
+        return reaction.users.remove(user)
+      }
+
       // If the name exists, prioritise using that, otherwise, use the ID. If neither are in the list, don't run anything.
       const reactionName = Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.name)
         ? reaction.emoji.name
         : Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.id) ? reaction.emoji.id : null
       if (reactionName) {
-        this.reactionCollector.on('end', () => {
-          !sameReactions ? this.clearReactions() : reaction.users.remove(user)
-        })
+        if (typeof this.currentPage.reactions[reactionName] === 'function') {
+          return this.currentPage.reactions[reactionName]()
+        }
 
         switch (this.currentPage.reactions[reactionName]) {
           case 'first':
@@ -213,7 +228,6 @@ module.exports.Menu = class extends EventEmitter {
             this.delete()
             break
           default:
-            // TODO: Sort out documenting this as a TSDoc event.
             sameReactions = JSON.stringify(this.menu.reactions.cache.keyArray()) === JSON.stringify(Object.keys(this.pages.find(p => p.name === this.currentPage.reactions[reactionName]).reactions))
             this.setPage(this.pages.findIndex(p => p.name === this.currentPage.reactions[reactionName]))
             break
