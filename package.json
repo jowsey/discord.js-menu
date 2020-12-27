@@ -1,6 +1,6 @@
 {
   "name": "discord.js-menu",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "💬 Easily create Discord.js embed menus with reactions and unlimited customisable pages.",
   "main": "index.js",
   "scripts": {

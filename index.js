@@ -186,15 +186,16 @@ module.exports.Menu = class extends EventEmitter {
     })
 
     this.reactionCollector.on('collect', (reaction, user) => {
-      // If a 3rd party tries to add reactions or the reaction isn't registered, delete it.
-      if (user.id !== this.userID || !Object.keys(this.currentPage.reactions).includes(reaction.emoji.name)) {
-        return reaction.users.remove(user)
-      }
-
       // If the name exists, prioritise using that, otherwise, use the ID. If neither are in the list, don't run anything.
       const reactionName = Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.name)
         ? reaction.emoji.name
         : Object.prototype.hasOwnProperty.call(this.currentPage.reactions, reaction.emoji.id) ? reaction.emoji.id : null
+
+      // If a 3rd party tries to add reactions or the reaction isn't registered, delete it.
+      if (user.id !== this.userID || !Object.keys(this.currentPage.reactions).includes(reactionName)) {
+        return reaction.users.remove(user)
+      }
+
       if (reactionName) {
         if (typeof this.currentPage.reactions[reactionName] === 'function') {
           return this.currentPage.reactions[reactionName]()
