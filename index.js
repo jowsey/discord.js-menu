@@ -158,14 +158,18 @@ module.exports.Menu = class extends EventEmitter {
    * React to the new page with all of it's defined reactions
    */
   addReactions () {
+    let delay = 0
     for (const reaction in this.currentPage.reactions) {
-      this.menu.react(reaction).catch(error => {
-        if (error.toString().indexOf('Unknown Emoji') >= 0) {
-          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | The emoji you were trying to add to page "${this.currentPage.name}" (${reaction}) probably doesn't exist. You probably entered the ID wrong when adding a custom emoji.`)
-        } else {
-          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | You're probably missing 'ADD_REACTIONS' in #${this.channel.name} (${this.channel.guild.name}), needed for adding reactions to the page.`)
-        }
-      })
+      delay += 1000
+      setTimeout(() => {
+        this.menu.react(reaction).catch(error => {
+          if (error.toString().indexOf('Unknown Emoji') >= 0) {
+            console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | The emoji you were trying to add to page "${this.currentPage.name}" (${reaction}) probably doesn't exist. You probably entered the ID wrong when adding a custom emoji.`)
+          } else {
+            console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | You're probably missing 'ADD_REACTIONS' in #${this.channel.name} (${this.channel.guild.name}), needed for adding reactions to the page.`)
+          }
+        })
+      }, delay)
     }
   }
 
