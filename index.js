@@ -12,7 +12,7 @@ class Page {
     * @param {Object.<string, string | function>} reactions The reactions that'll be added to this page.
     * @param {number} index The index of this page in the Menu
      */
-  constructor (name, content, reactions, index) {
+  constructor(name, content, reactions, index) {
     this.name = name
     this.content = content
     this.reactions = reactions
@@ -40,7 +40,7 @@ module.exports.Menu = class extends EventEmitter {
     * Blacklisted page names are: `first, last, previous, next, stop, delete`.
     * These names perform special functions and should only be used as reaction destinations.
     */
-  constructor (channel, userID, pages, ms = 180000) {
+  constructor(channel, userID, pages, ms = 180000) {
     super()
     this.channel = channel
     this.userID = userID
@@ -89,10 +89,10 @@ module.exports.Menu = class extends EventEmitter {
   /**
    * Send the Menu and begin listening for reactions.
    */
-  start () {
+  start() {
     // TODO: Sort out documenting this as a TSDoc event.
     this.emit('pageChange', this.currentPage)
-    this.channel.send(this.currentPage.content).then(menu => {
+    this.channel.send(this.currentPage.content).then(async menu => {
       this.menu = menu
       this.addReactions()
       this.awaitReactions()
@@ -108,33 +108,37 @@ module.exports.Menu = class extends EventEmitter {
   /**
    * Stop listening for new reactions.
    */
-  stop () {
+  async stop() {
     if (this.reactionCollector) {
       this.reactionCollector.stop()
-      this.clearReactions()
+      await this.clearReactions()
     }
   }
 
   /**
    * Delete the menu message.
    */
-  delete () {
-    if (this.reactionCollector) this.reactionCollector.stop()
-    if (this.menu) this.menu.delete()
+  async delete() {
+    if (this.reactionCollector) await this.reactionCollector.stop()
+    await this.clearReactions()
+    if (this.menu) await this.menu.delete()
   }
 
   /**
    * Remove all reactions from the menu message.
    */
-  clearReactions () {
+  clearReactions() {
     if (this.menu) {
-      return this.menu.reactions.removeAll().catch(error => {
-        if (this.channel.type === 'dm') {
-          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | Told you so.`)
-        } else {
-          console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | You're probably missing 'MANAGE_MESSAGES' in #${this.channel.name} (${this.channel.guild.name}), needed for removing reactions when changing pages.`)
-        }
+      let cleared = new Promise(resolve => {
+        resolve(this.menu.reactions.removeAll().catch(error => {
+          if (this.channel.type === 'dm') {
+            console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | Told you so.`)
+          } else {
+            console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to remove message reactions) | You're probably missing 'MANAGE_MESSAGES' in #${this.channel.name} (${this.channel.guild.name}), needed for removing reactions when changing pages.`)
+          }
+        }))
       })
+      return cleared;
     }
   }
 
@@ -142,7 +146,7 @@ module.exports.Menu = class extends EventEmitter {
    * Jump to a new page in the Menu.
    * @param {Number} page The index of the page the Menu should jump to.
    */
-  setPage (page = 0) {
+  setPage(page = 0) {
     this.emit('pageChange', this.pages[page])
 
     this.pageIndex = page
@@ -150,6 +154,7 @@ module.exports.Menu = class extends EventEmitter {
     this.menu.edit(this.currentPage.content)
 
     this.reactionCollector.stop()
+    this.clearReactions()
     this.addReactions()
     this.awaitReactions()
   }
@@ -157,9 +162,9 @@ module.exports.Menu = class extends EventEmitter {
   /**
    * React to the new page with all of it's defined reactions
    */
-  addReactions () {
+  async addReactions() {
     for (const reaction in this.currentPage.reactions) {
-      this.menu.react(reaction).catch(error => {
+      await this.menu.react(reaction).catch(error => {
         if (error.toString().indexOf('Unknown Emoji') >= 0) {
           console.log(`\x1B[96m[discord.js-menu]\x1B[0m ${error.toString()} (whilst trying to add reactions to message) | The emoji you were trying to add to page "${this.currentPage.name}" (${reaction}) probably doesn't exist. You probably entered the ID wrong when adding a custom emoji.`)
         } else {
@@ -172,7 +177,7 @@ module.exports.Menu = class extends EventEmitter {
   /**
    * Start a reaction collector and switch pages where required.
    */
-  awaitReactions () {
+  awaitReactions() {
     this.reactionCollector = this.menu.createReactionCollector((reaction, user) => user.id !== this.menu.client.user.id, { idle: this.ms })
 
     let sameReactions
