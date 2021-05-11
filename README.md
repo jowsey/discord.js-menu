@@ -7,6 +7,12 @@
     <img alt="npm (prod) dependency version" src="https://img.shields.io/npm/dependency-version/discord.js-menu/discord.js">
 </div>
 
+# Update as of 11th May 2021:
+I currently don't have enough time to put into maintaining my old code, due to college. In the mean time, I encourage you to adapt my code into your own implementation. There's nothing particularly terrible about this code - at least, there *shouldn't* be - but I'm not around to add new features/bug fixes/etc. I'm still checking the support Discord server when I can, to answer questions.  
+I intend on re-writing this library in TypeScript when I return. All the best :)
+
+---
+
 ### Project Summary
 Create flexible, understandable and performant Discord reaction menus with ease. This package is an addon for Discord.js that automates all aspects of a reaction-based navigation menu.  
 Besides creating it, of course. It'd be pretty useless if you couldn't create the menus yourself.
