@@ -92,7 +92,7 @@ module.exports.Menu = class extends EventEmitter {
   start () {
     // TODO: Sort out documenting this as a TSDoc event.
     this.emit('pageChange', this.currentPage)
-    this.channel.send(this.currentPage.content).then(menu => {
+    this.channel.send({ embed: this.currentPage.content }).then(menu => {
       this.menu = menu
       this.addReactions()
       this.awaitReactions()
@@ -147,7 +147,7 @@ module.exports.Menu = class extends EventEmitter {
 
     this.pageIndex = page
     this.currentPage = this.pages[this.pageIndex]
-    this.menu.edit(this.currentPage.content)
+    this.menu.edit({ embed: this.currentPage.content })
 
     this.reactionCollector.stop()
     this.addReactions()
